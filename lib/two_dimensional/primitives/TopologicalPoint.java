@@ -1,7 +1,7 @@
 package lib.two_dimensional.primitives;
 
 public interface TopologicalPoint<Point> extends Comparable<Point> {
-	public GeometryOrientation orientVsLine(Point begin, Point end);
+	public int compareVsLine(Point begin, Point end);
 
 	public GeometryOrientation orientVsSegment(Point begin, Point end);
 

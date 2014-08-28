@@ -66,18 +66,9 @@ public class IntPoint implements TopologicalPoint<IntPoint>, Serializable, Clone
 	}
 
 	@Override
-	public GeometryOrientation orientVsLine(IntPoint b, IntPoint e) {
-
+	public int compareVsLine(IntPoint b, IntPoint e) {
 		long s = det((long) x - b.x, (long) y - b.y, (long) e.x - b.x, (long) e.y - b.y);
-
-		if (s > 0) {
-			return GeometryOrientation.RIGHT;
-		} else if (s == 0) {
-			return GeometryOrientation.EDGE;
-		} else {
-			return GeometryOrientation.LEFT;
-		}
-
+		return Long.compare(s, 0);
 	}
 
 	@Override
