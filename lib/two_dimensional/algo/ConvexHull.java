@@ -48,7 +48,7 @@ public class ConvexHull {
 				l = p;
 			}
 			if (r.compareTo(p) < 0) {
-				l = p;
+				r = p;
 			}
 		}
 

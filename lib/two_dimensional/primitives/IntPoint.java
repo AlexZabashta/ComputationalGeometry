@@ -142,4 +142,42 @@ public class IntPoint implements TopologicalPoint<IntPoint>, Serializable, Clone
 
 	}
 
+	public IntPoint getIntersectSegmentsPoint(IntPoint le, IntPoint gb, IntPoint ge) {
+		IntPoint lb = this;
+
+		long gbx = gb.x, gby = gb.y;
+		long gex = ge.x, gey = ge.y;
+		long lbx = lb.x, lby = lb.y;
+		long lex = le.x, ley = le.y;
+
+		long ag = gey - gby, bg = gbx - gex, cg = gby * (gex - gbx) - gbx * (gey - gby);
+		long al = ley - lby, bl = lbx - lex, cl = lby * (lex - lbx) - lbx * (ley - lby);
+		long ux = cg * bl - cl * bg, uy = ag * cl - al * cg, ud = al * bg - ag * bl;
+
+		if (ud == 0) {
+			return null;
+		}
+		System.out.println(gb + " " + ge);
+		System.out.println(lb + " " + le);
+		System.out.println(new IntPoint((int) (ux / ud), (int) (uy / ud)));
+		System.out.println();
+
+		if (Math.min(gbx * ud, gex * ud) <= ux && ux <= Math.max(gbx * ud, gex * ud)) {
+			if (Math.min(gby * ud, gey * ud) <= uy && uy <= Math.max(gby * ud, gey * ud)) {
+				if (Math.min(lbx * ud, lex * ud) <= ux && ux <= Math.max(lbx * ud, lex * ud)) {
+					if (Math.min(lby * ud, ley * ud) <= uy && uy <= Math.max(lby * ud, ley * ud)) {
+						return new IntPoint((int) (ux / ud), (int) (uy / ud));
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public boolean isSegmentsIntersect(IntPoint ue, IntPoint vb, IntPoint ve) {
+		IntPoint ub = this;
+		return false;
+	}
+
 }

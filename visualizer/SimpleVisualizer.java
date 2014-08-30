@@ -1,13 +1,9 @@
 package visualizer;
 
-import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
+import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -18,25 +14,44 @@ import javax.swing.WindowConstants;
 public class SimpleVisualizer extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	BufferedImage canvas;
-	JLabel jLabel = new JLabel();
-	int x = 0, y = 0;
-	int height, width;
-
-	int[] black;
-
-	private void reDraw() {
-		height = getHeight();
-		width = getWidth();
-		setTitle(height + " " + width);
-		canvas = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-		jLabel.setIcon(new ImageIcon(canvas));
-		black = new int[width * height];
-	}
+	private BufferedImage canvas = new BufferedImage(42, 23, BufferedImage.TYPE_INT_RGB);
+	private JLabel jLabel = new JLabel();
+	private ArrayList<GraphicComponent> gp = new ArrayList<GraphicComponent>();
 
 	public void clearCanvas() {
-		Arrays.fill(black, 0xFF000000);
-		canvas.setRGB(0, 0, width, height, black, 0, width);
+		resizeCanvas();
+		synchronized (gp) {
+			gp.clear();
+		}
+	}
+
+	private void resizeCanvas() {
+		canvas = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
+		jLabel.setIcon(new ImageIcon(canvas));
+
+	}
+
+	public void draw(GraphicComponent go) {
+		synchronized (gp) {
+			gp.add(go);
+		}
+		synchronized (canvas) {
+			go.draw(canvas.getGraphics());
+			repaint();
+		}
+	}
+
+	public void onResize() {
+		resizeCanvas();
+		setTitle("Resize: " + getHeight() + "x" + getWidth());
+		synchronized (gp) {
+			synchronized (canvas) {
+				for (GraphicComponent go : gp) {
+					go.draw(canvas.getGraphics());
+				}
+				repaint();
+			}
+		}
 	}
 
 	public SimpleVisualizer(boolean exitOnClose) {
@@ -46,28 +61,16 @@ public class SimpleVisualizer extends JFrame {
 		setBounds(100, 0, 640, 480);
 		JPanel mainPanel = new JPanel();
 
-		mainPanel.add(jLabel);
-		add(mainPanel);
-
+		resizeCanvas();
 		addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentResized(ComponentEvent e) {
-				reDraw();
+				onResize();
 			}
 		});
 
-		mainPanel.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mousePressed(MouseEvent e) {
-				setTitle(e.getButton() + " " + e.getX() + " " + e.getY());
-				Graphics g = canvas.getGraphics();
-				g.setColor(Color.MAGENTA);
-				g.drawLine(x, y, e.getX(), e.getY());
-				x = e.getX();
-				y = e.getY();
-				repaint();
-			}
-		});
+		mainPanel.add(jLabel);
+		add(mainPanel);
 
 		setVisible(true);
 	}

@@ -11,4 +11,6 @@ public interface TopologicalPoint<Point> extends Comparable<Point> {
 
 	public int compareDistanceToLine(Point p, Point b, Point e);
 
+	public boolean isSegmentsIntersect(Point ue, Point vb, Point ve);
+
 }
